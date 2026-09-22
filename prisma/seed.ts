@@ -1,6 +1,5 @@
-import { PrismaClient, UserStatus, TenantSize, ClientStatus, PriorityLevel, ProjectType, ProjectStatus, TaskStatus, DeliverableStatus, ApprovalStatus, DocumentType, DocumentStatus, ResourceType, MeetingType, MeetingStatus, TicketCategory, TicketStatus, InvoiceStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import mariadb from "mariadb";
 import bcrypt from "bcryptjs";
 
 const rawConnStr = process.env.DATABASE_URL || "mysql://root@localhost:3306/client_portal";
@@ -128,17 +127,17 @@ async function main() {
       name: "Acme Corporation",
       logo: "/logos/acme.png",
       industry: "E-Commerce & Retail",
-      companySize: TenantSize.ENTERPRISE,
+      companySize: "ENTERPRISE",
       website: "https://acmecorp.example.com",
       email: "contact@acmecorp.example.com",
       phone: "+1 (555) 234-5678",
       primaryContact: "Sarah Jenkins (VP Digital)",
-      clientStatus: ClientStatus.ACTIVE,
+      clientStatus: "ACTIVE",
       servicePackages: JSON.stringify(["Full Digital Retainer", "SEO Accelerator", "Web Development"]),
       monthlyRetainerValue: 12500.00,
       contractStart: new Date("2026-01-01"),
       contractEnd: new Date("2026-12-31"),
-      priorityLevel: PriorityLevel.HIGH,
+      priorityLevel: "HIGH",
       notes: "Enterprise account requiring weekly strategy syncs and strict turnaround SLAs.",
     },
   });
@@ -148,17 +147,17 @@ async function main() {
       name: "Nexus Tech Solutions",
       logo: "/logos/nexustech.png",
       industry: "Software & Cloud Services",
-      companySize: TenantSize.MEDIUM_BUSINESS,
+      companySize: "MEDIUM_BUSINESS",
       website: "https://nexustech.example.com",
       email: "hello@nexustech.example.com",
       phone: "+1 (555) 987-6543",
       primaryContact: "David Miller (CTO)",
-      clientStatus: ClientStatus.ACTIVE,
+      clientStatus: "ACTIVE",
       servicePackages: JSON.stringify(["SaaS Branding", "UI/UX Design System"]),
       monthlyRetainerValue: 8000.00,
       contractStart: new Date("2026-03-01"),
       contractEnd: new Date("2027-02-28"),
-      priorityLevel: PriorityLevel.MEDIUM,
+      priorityLevel: "MEDIUM",
       notes: "Focusing on upcoming v2 platform redesign and developer documentation branding.",
     },
   });
@@ -175,7 +174,7 @@ async function main() {
       title: "Agency Founder & CEO",
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["SUPER_ADMIN"],
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
@@ -186,7 +185,7 @@ async function main() {
       title: "Lead Project Manager",
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["PROJECT_MANAGER"],
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
@@ -197,7 +196,7 @@ async function main() {
       title: "Senior UI/UX Designer",
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["DESIGNER"],
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
@@ -208,7 +207,7 @@ async function main() {
       title: "Lead Frontend Developer",
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["DEVELOPER"],
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
@@ -220,11 +219,11 @@ async function main() {
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["CLIENT_ADMIN"],
       tenantId: acmeTenant.id,
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
-  const clientUserAcme = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: "clientuser@acme.com",
       name: "Tom Holland",
@@ -232,11 +231,11 @@ async function main() {
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["CLIENT_USER"],
       tenantId: acmeTenant.id,
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
-  const clientAdminNexus = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: "clientadmin@nexustech.com",
       name: "David Miller",
@@ -244,7 +243,7 @@ async function main() {
       passwordHash: defaultPasswordHash,
       roleId: rolesMap["CLIENT_ADMIN"],
       tenantId: nexusTenant.id,
-      status: UserStatus.ACTIVE,
+      status: "ACTIVE",
     },
   });
 
@@ -256,9 +255,9 @@ async function main() {
       name: "Acme E-Commerce Platform Redesign v3",
       tenantId: acmeTenant.id,
       projectManagerId: pmUser.id,
-      projectType: ProjectType.WEBSITE,
-      status: ProjectStatus.IN_PROGRESS,
-      priority: PriorityLevel.HIGH,
+      projectType: "WEBSITE",
+      status: "IN_PROGRESS",
+      priority: "HIGH",
       startDate: new Date("2026-08-01"),
       deadline: new Date("2026-11-15"),
       progress: 65,
@@ -275,9 +274,9 @@ async function main() {
       name: "Q3 High-Intent Performance Marketing & SEO",
       tenantId: acmeTenant.id,
       projectManagerId: pmUser.id,
-      projectType: ProjectType.SEO,
-      status: ProjectStatus.IN_PROGRESS,
-      priority: PriorityLevel.URGENT,
+      projectType: "SEO",
+      status: "IN_PROGRESS",
+      priority: "URGENT",
       startDate: new Date("2026-07-01"),
       deadline: new Date("2026-09-30"),
       progress: 80,
@@ -295,9 +294,9 @@ async function main() {
       name: "Nexus Cloud Developer Portal Branding",
       tenantId: nexusTenant.id,
       projectManagerId: pmUser.id,
-      projectType: ProjectType.BRANDING,
-      status: ProjectStatus.REVIEW,
-      priority: PriorityLevel.MEDIUM,
+      projectType: "BRANDING",
+      status: "REVIEW",
+      priority: "MEDIUM",
       startDate: new Date("2026-08-15"),
       deadline: new Date("2026-10-01"),
       progress: 90,
@@ -319,8 +318,8 @@ async function main() {
       tenantId: acmeTenant.id,
       creatorId: pmUser.id,
       assigneeId: designerUser.id,
-      status: TaskStatus.CLIENT_REVIEW,
-      priority: PriorityLevel.HIGH,
+      status: "CLIENT_REVIEW",
+      priority: "HIGH",
       deadline: new Date("2026-09-25"),
       description: "Design high-fidelity responsive wireframes for desktop & mobile hero section.",
       internalNotes: "Designer completed V2 based on Sarah's feedback regarding call-to-action button color.",
@@ -328,15 +327,15 @@ async function main() {
     },
   });
 
-  const task2 = await prisma.task.create({
+  await prisma.task.create({
     data: {
       title: "API Checkout Integration & Payment Boundary",
       projectId: acmeProject1.id,
       tenantId: acmeTenant.id,
       creatorId: pmUser.id,
       assigneeId: devUser.id,
-      status: TaskStatus.IN_PROGRESS,
-      priority: PriorityLevel.MEDIUM,
+      status: "IN_PROGRESS",
+      priority: "MEDIUM",
       deadline: new Date("2026-10-10"),
       description: "Build secure tokenized payment endpoint integration.",
       internalNotes: "Internal dev task only. Hidden from client until fully QA tested.",
@@ -353,10 +352,10 @@ async function main() {
       tenantId: acmeTenant.id,
       creatorId: designerUser.id,
       currentVersion: "V2",
-      status: DeliverableStatus.CLIENT_VISIBLE,
+      status: "CLIENT_VISIBLE",
       clientVisible: true,
       clientApprovalRequired: true,
-      approvalStatus: ApprovalStatus.PENDING,
+      approvalStatus: "PENDING",
       internalNotes: "V2 reflects green primary buttons and gold accent highlights requested by client.",
       clientDescription: "Updated high-fidelity UI layout for the Acme main storefront homepage. Click the link to review interactive Figma prototype.",
       externalDriveLink: "https://drive.google.com/file/d/demo-acme-homepage-v2/view?usp=sharing",
@@ -370,7 +369,7 @@ async function main() {
       submittedById: designerUser.id,
       externalDriveLink: "https://drive.google.com/file/d/demo-acme-homepage-v1/view?usp=sharing",
       description: "Initial desktop layout wireframes",
-      reviewStatus: DeliverableStatus.REVISION_REQUIRED,
+      reviewStatus: "REVISION_REQUIRED",
       revisionNotes: "Client requested India Green (#138808) CTA buttons and Gold accent badges.",
     },
   });
@@ -382,7 +381,7 @@ async function main() {
       submittedById: designerUser.id,
       externalDriveLink: "https://drive.google.com/file/d/demo-acme-homepage-v2/view?usp=sharing",
       description: "Refined colors with white base, green buttons, and gold highlights.",
-      reviewStatus: DeliverableStatus.CLIENT_VISIBLE,
+      reviewStatus: "CLIENT_VISIBLE",
       revisionNotes: "Submitted to client for approval.",
     },
   });
@@ -396,7 +395,7 @@ async function main() {
         tenantId: acmeTenant.id,
         projectId: acmeProject1.id,
         name: "Acme Official Brand Guidelines & Logo Assets",
-        resourceType: ResourceType.BRAND_ASSET,
+        resourceType: "BRAND_ASSET",
         url: "https://drive.google.com/drive/folders/acme-brand-assets-2026",
         description: "Vector logos, font files (Inter Tight), and color specification sheets.",
         clientVisible: true,
@@ -405,7 +404,7 @@ async function main() {
         tenantId: acmeTenant.id,
         projectId: acmeProject1.id,
         name: "Website Deliverables & Prototype Drive Root",
-        resourceType: ResourceType.WEBSITE_FILES,
+        resourceType: "WEBSITE_FILES",
         url: "https://drive.google.com/drive/folders/acme-website-deliverables",
         description: "Contains all exported design assets, wireframes, and staging build builds.",
         clientVisible: true,
@@ -414,7 +413,7 @@ async function main() {
         tenantId: acmeTenant.id,
         projectId: acmeProject2.id,
         name: "August 2026 SEO & Performance Marketing Report",
-        resourceType: ResourceType.MARKETING_REPORTS,
+        resourceType: "MARKETING_REPORTS",
         url: "https://drive.google.com/file/d/acme-seo-report-august-2026/view",
         description: "Comprehensive traffic analysis, keyword rankings, and ROI performance breakdown.",
         clientVisible: true,
@@ -423,7 +422,7 @@ async function main() {
         tenantId: nexusTenant.id,
         projectId: nexusProject.id,
         name: "Nexus Tech Brand Deck & Iconography Package",
-        resourceType: ResourceType.BRAND_ASSET,
+        resourceType: "BRAND_ASSET",
         url: "https://drive.google.com/drive/folders/nexustech-brand-assets",
         description: "High-resolution SVG icon set and brand presentation slides.",
         clientVisible: true,
@@ -437,13 +436,13 @@ async function main() {
   await prisma.meeting.create({
     data: {
       tenantId: acmeTenant.id,
-      type: MeetingType.STRATEGY,
+      type: "STRATEGY",
       hostId: pmUser.id,
       attendees: JSON.stringify(["sarah@acmecorp.example.com", "pm@agency.com"]),
       dateTime: new Date("2026-09-28T14:00:00Z"),
       timeZone: "America/New_York",
       externalBookingId: "cal-booking-acme-sync-9821",
-      status: MeetingStatus.SCHEDULED,
+      status: "SCHEDULED",
       notes: "Bi-weekly strategy sync to review Q4 performance marketing goals and website rollout date.",
       bookingUrl: "https://cal.com/agency-strategy/30min",
     },
@@ -456,9 +455,9 @@ async function main() {
       tenantId: acmeTenant.id,
       submittedById: clientAdminAcme.id,
       subject: "Add New Product Category Banner to Staging Homepage",
-      category: TicketCategory.WEBSITE,
-      priority: PriorityLevel.HIGH,
-      status: TicketStatus.IN_PROGRESS,
+      category: "WEBSITE",
+      priority: "HIGH",
+      status: "IN_PROGRESS",
       assigneeId: devUser.id,
       description: "We need the new Autumn promotional banner integrated into the top hero carousel on the staging environment.",
       internalNotes: "Dev assigned. High priority request.",
@@ -477,7 +476,7 @@ async function main() {
         total: 12500.00,
         currency: "USD",
         dueDate: new Date("2026-10-01"),
-        status: InvoiceStatus.UNPAID,
+        status: "UNPAID",
         notes: "Monthly Digital Retainer & Website Milestone 2 Payment.",
       },
       {
@@ -490,7 +489,7 @@ async function main() {
         currency: "USD",
         dueDate: new Date("2026-09-01"),
         paidDate: new Date("2026-08-29"),
-        status: InvoiceStatus.PAID,
+        status: "PAID",
         paymentMethod: "Bank Wire Transfer",
         receiptUrl: "https://drive.google.com/file/d/receipt-inv-072/view",
         notes: "Paid in full. Thank you!",
@@ -504,7 +503,7 @@ async function main() {
         total: 8000.00,
         currency: "USD",
         dueDate: new Date("2026-09-15"),
-        status: InvoiceStatus.OVERDUE,
+        status: "OVERDUE",
         notes: "Branding Milestone 1 Retainer.",
       },
     ],
