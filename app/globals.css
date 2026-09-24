@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --font-heading: 'Inter Tight', var(--font-inter-tight), sans-serif;
+  --font-sub: 'Bricolage Grotesque', var(--font-bricolage), sans-serif;
+  --font-sans: 'Bricolage Grotesque', var(--font-bricolage), sans-serif;
+}
+
 :root {
   --font-inter-tight: 'Inter Tight', sans-serif;
+  --font-bricolage: 'Bricolage Grotesque', sans-serif;
   --background: #FFFFFF;
   --foreground: #0F172A;
   --platinum: #F2F3F4;
@@ -14,8 +21,27 @@
 body {
   background-color: #F2F3F4;
   color: var(--foreground);
-  font-family: var(--font-inter-tight), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headers and Bold elements use Inter Tight */
+h1, h2, h3, h4, h5, h6,
+.font-bold, .font-extrabold, .font-semibold,
+b, strong, th, header {
+  font-family: var(--font-inter-tight), 'Inter Tight', sans-serif !important;
+}
+
+/* Subtitles, subheadings, paragraphs, body text use Bricolage Grotesque */
+p, span, div, td, input, select, textarea, label, a, .font-sub {
+  font-family: var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
+}
+
+/* Re-enforce headers & bold text over general element selectors */
+h1, h2, h3, h4, h5, h6,
+.font-bold, .font-extrabold, .font-semibold,
+b, strong, th {
+  font-family: var(--font-inter-tight), 'Inter Tight', sans-serif !important;
 }
 
 /* Custom Scrollbar */

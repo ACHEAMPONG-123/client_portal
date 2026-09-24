@@ -133,3 +133,34 @@ export async function getAuditLogsAction() {
 
   return auditLogs;
 }
+
+/**
+ * Server Action: Fetches all tenant companies for Super Admin console.
+ */
+export async function getTenantsAction() {
+  await requireAuth();
+  const tenants = await prisma.tenant.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      users: { select: { id: true, name: true, email: true } },
+      projects: { select: { id: true, name: true, status: true } },
+    },
+  });
+  return tenants;
+}
+
+/**
+ * Server Action: Fetches all user directory records.
+ */
+export async function getUsersAction() {
+  await requireAuth();
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      role: { select: { id: true, name: true } },
+      tenant: { select: { id: true, name: true } },
+    },
+  });
+  return users;
+}
+

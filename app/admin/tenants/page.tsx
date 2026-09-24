@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { createTenantAction } from "@/app/actions/admin-actions";
+import React, { useState, useEffect } from "react";
+import { createTenantAction, getTenantsAction } from "@/app/actions/admin-actions";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { Building2, PlusCircle, ExternalLink } from "lucide-react";
 
 export default function AdminTenantsPage() {
+  const [tenants, setTenants] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -20,6 +22,21 @@ export default function AdminTenantsPage() {
   const [primaryContact, setPrimaryContact] = useState("");
   const [monthlyRetainerValue, setMonthlyRetainerValue] = useState("5000");
   const [submitting, setSubmitting] = useState(false);
+
+  const loadTenants = async () => {
+    setLoading(true);
+    try {
+      const data = await getTenantsAction();
+      setTenants(data);
+    } catch (e) {
+      console.error("Failed to load tenants", e);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadTenants();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +58,7 @@ export default function AdminTenantsPage() {
       setIsOpen(false);
       setName("");
       setEmail("");
+      loadTenants();
     }
   };
 
@@ -68,67 +86,49 @@ export default function AdminTenantsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Tenant 1 Card */}
-            <Card className="hover:border-[#138808] transition-all">
-              <CardHeader className="flex flex-row items-start justify-between pb-2">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <CardTitle className="text-lg">Acme Corporation</CardTitle>
-                    <Badge variant="active">ACTIVE</Badge>
-                  </div>
-                  <p className="text-xs text-[#64748B] mt-0.5">E-Commerce & Retail • Enterprise</p>
-                </div>
-                <div className="p-2.5 bg-[#E8F5E9] text-[#138808] rounded-xl font-bold text-xs">
-                  $12,500/mo
-                </div>
-              </CardHeader>
+            {loading ? (
+              <div className="col-span-2 py-8 text-center text-xs font-bold text-[#64748B]">
+                Loading Tenant Workspaces...
+              </div>
+            ) : tenants.length === 0 ? (
+              <div className="col-span-2 py-8 text-center text-xs font-bold text-[#94A3B8]">
+                No client tenant companies found. Register one above.
+              </div>
+            ) : (
+              tenants.map((t) => (
+                <Card key={t.id} className="hover:border-[#138808] transition-all">
+                  <CardHeader className="flex flex-row items-start justify-between pb-2">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <CardTitle className="text-lg">{t.name}</CardTitle>
+                        <Badge variant="active">{t.clientStatus || "ACTIVE"}</Badge>
+                      </div>
+                      <p className="text-xs text-[#64748B] mt-0.5">
+                        {t.industry || "General"} • {t.companySize ? t.companySize.replace("_", " ") : "Small Business"}
+                      </p>
+                    </div>
+                    <div className="p-2.5 bg-[#E8F5E9] text-[#138808] rounded-xl font-bold text-xs">
+                      ${t.monthlyRetainerValue ? Number(t.monthlyRetainerValue).toLocaleString() : "0"}/mo
+                    </div>
+                  </CardHeader>
 
-              <CardContent className="space-y-3 pt-2 text-xs text-[#475569]">
-                <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] space-y-1">
-                  <p><strong className="text-[#0F172A]">Primary Contact:</strong> Sarah Jenkins (VP Digital)</p>
-                  <p><strong className="text-[#0F172A]">Email:</strong> contact@acmecorp.example.com</p>
-                  <p><strong className="text-[#0F172A]">Website:</strong> https://acmecorp.example.com</p>
-                </div>
+                  <CardContent className="space-y-3 pt-2 text-xs text-[#475569]">
+                    <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] space-y-1">
+                      <p><strong className="text-[#0F172A]">Primary Contact:</strong> {t.primaryContact || "N/A"}</p>
+                      <p><strong className="text-[#0F172A]">Email:</strong> {t.email || "N/A"}</p>
+                      <p><strong className="text-[#0F172A]">Website:</strong> {t.website || "N/A"}</p>
+                    </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9]">
-                  <span className="text-[11px] text-[#94A3B8]">Tenant ID: clx_tenant_acme</span>
-                  <a href="/client/dashboard" className="font-bold text-[#138808] hover:underline flex items-center gap-1">
-                    Inspect Workspace <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tenant 2 Card */}
-            <Card className="hover:border-[#138808] transition-all">
-              <CardHeader className="flex flex-row items-start justify-between pb-2">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <CardTitle className="text-lg">Nexus Tech Solutions</CardTitle>
-                    <Badge variant="active">ACTIVE</Badge>
-                  </div>
-                  <p className="text-xs text-[#64748B] mt-0.5">Software & Cloud • Medium Business</p>
-                </div>
-                <div className="p-2.5 bg-[#E8F5E9] text-[#138808] rounded-xl font-bold text-xs">
-                  $8,000/mo
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-3 pt-2 text-xs text-[#475569]">
-                <div className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] space-y-1">
-                  <p><strong className="text-[#0F172A]">Primary Contact:</strong> David Miller (CTO)</p>
-                  <p><strong className="text-[#0F172A]">Email:</strong> hello@nexustech.example.com</p>
-                  <p><strong className="text-[#0F172A]">Website:</strong> https://nexustech.example.com</p>
-                </div>
-
-                <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9]">
-                  <span className="text-[11px] text-[#94A3B8]">Tenant ID: clx_tenant_nexus</span>
-                  <a href="/client/dashboard" className="font-bold text-[#138808] hover:underline flex items-center gap-1">
-                    Inspect Workspace <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
+                    <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9]">
+                      <span className="text-[11px] text-[#94A3B8]">ID: {t.id}</span>
+                      <a href="/client/dashboard" className="font-bold text-[#138808] hover:underline flex items-center gap-1">
+                        Inspect Workspace <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </main>
       </div>

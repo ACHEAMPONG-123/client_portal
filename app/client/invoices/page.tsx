@@ -122,10 +122,10 @@ export default function ClientInvoicesPage() {
                             <a
                               href={inv.receiptUrl}
                               target="_blank"
-                              rel="noreferrer"
-                              className="text-xs font-bold text-[#64748B] hover:text-[#0F172A]"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[#64748B] hover:text-[#0F172A]"
                             >
-                              Receipt ↗
+                              <span>Receipt</span>
+                              <ExternalLink className="w-3 h-3" />
                             </a>
                           )}
                           {inv.status !== "PAID" && (

@@ -75,7 +75,8 @@ export async function loginAction(formData: FormData) {
     return { success: true, roleName: user.role.name };
   } catch (error: any) {
     console.error("Login action error:", error);
-    return { success: false, error: "An unexpected error occurred during login." };
+    const detail = process.env.NODE_ENV !== "production" && error?.message ? `: ${error.message}` : "";
+    return { success: false, error: `An unexpected error occurred during login${detail}.` };
   }
 }
 

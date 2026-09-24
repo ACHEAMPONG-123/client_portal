@@ -50,7 +50,7 @@ export default async function ClientDashboardPage() {
             <div>
               <div className="flex items-center space-x-2">
                 <h1 className="text-2xl font-extrabold text-[#0F172A] tracking-tight">
-                  Welcome back, {userSession.name.split(" ")[0]} 👋
+                  Welcome back, {userSession.name.split(" ")[0]}
                 </h1>
                 <Badge variant="active" className="text-xs">
                   {tenant.name}
@@ -298,8 +298,8 @@ export default async function ClientDashboardPage() {
                             <ExternalLink className="w-3 h-3 text-[#94A3B8] group-hover:text-[#138808]" />
                           </div>
                           <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-1">{res.description}</p>
-                          <span className="inline-block text-[10px] font-semibold text-[#138808] mt-1">
-                            Google Drive Link ↗
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#138808] mt-1">
+                            Google Drive Link <ExternalLink className="w-3 h-3" />
                           </span>
                         </div>
                       </a>

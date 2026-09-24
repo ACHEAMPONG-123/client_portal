@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { createUserAction } from "@/app/actions/admin-actions";
+import React, { useState, useEffect } from "react";
+import { createUserAction, getUsersAction } from "@/app/actions/admin-actions";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { Users, UserPlus, Shield } from "lucide-react";
 
 export default function AdminUsersPage() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,6 +20,21 @@ export default function AdminUsersPage() {
   const [roleName, setRoleName] = useState("CLIENT_ADMIN");
   const [title, setTitle] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await getUsersAction();
+      setUsers(data);
+    } catch (e) {
+      console.error("Failed to load users", e);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +54,7 @@ export default function AdminUsersPage() {
       setIsOpen(false);
       setName("");
       setEmail("");
+      loadUsers();
     }
   };
 
@@ -65,7 +83,7 @@ export default function AdminUsersPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>User Directory</CardTitle>
+              <CardTitle>User Directory ({users.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -75,34 +93,42 @@ export default function AdminUsersPage() {
                       <th className="py-3 px-3">Name & Title</th>
                       <th className="py-3 px-3">Email Address</th>
                       <th className="py-3 px-3">Assigned Role</th>
+                      <th className="py-3 px-3">Tenant / Affiliation</th>
                       <th className="py-3 px-3">Account Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#F1F5F9]">
-                    <tr className="hover:bg-[#F8FAFC]">
-                      <td className="py-3.5 px-3 font-bold text-[#0F172A]">
-                        Alex Vance <span className="text-[11px] font-normal text-[#64748B] block">Agency Founder & CEO</span>
-                      </td>
-                      <td className="py-3.5 px-3 text-[#475569]">superadmin@agency.com</td>
-                      <td className="py-3.5 px-3"><Badge variant="active">SUPER_ADMIN</Badge></td>
-                      <td className="py-3.5 px-3"><Badge variant="completed">ACTIVE</Badge></td>
-                    </tr>
-                    <tr className="hover:bg-[#F8FAFC]">
-                      <td className="py-3.5 px-3 font-bold text-[#0F172A]">
-                        Marcus Aurelius <span className="text-[11px] font-normal text-[#64748B] block">Lead Project Manager</span>
-                      </td>
-                      <td className="py-3.5 px-3 text-[#475569]">pm@agency.com</td>
-                      <td className="py-3.5 px-3"><Badge variant="inProgress">PROJECT_MANAGER</Badge></td>
-                      <td className="py-3.5 px-3"><Badge variant="completed">ACTIVE</Badge></td>
-                    </tr>
-                    <tr className="hover:bg-[#F8FAFC]">
-                      <td className="py-3.5 px-3 font-bold text-[#0F172A]">
-                        Sarah Jenkins <span className="text-[11px] font-normal text-[#64748B] block">VP of Marketing (Acme Corp)</span>
-                      </td>
-                      <td className="py-3.5 px-3 text-[#475569]">clientadmin@acme.com</td>
-                      <td className="py-3.5 px-3"><Badge variant="gold">CLIENT_ADMIN</Badge></td>
-                      <td className="py-3.5 px-3"><Badge variant="completed">ACTIVE</Badge></td>
-                    </tr>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-xs text-[#64748B] font-bold">
+                          Loading user directory...
+                        </td>
+                      </tr>
+                    ) : users.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-xs text-[#94A3B8]">
+                          No users found.
+                        </td>
+                      </tr>
+                    ) : (
+                      users.map((u) => (
+                        <tr key={u.id} className="hover:bg-[#F8FAFC]">
+                          <td className="py-3.5 px-3 font-bold text-[#0F172A]">
+                            {u.name} <span className="text-[11px] font-normal text-[#64748B] block">{u.title || "User"}</span>
+                          </td>
+                          <td className="py-3.5 px-3 text-[#475569]">{u.email}</td>
+                          <td className="py-3.5 px-3">
+                            <Badge variant={u.role.name.startsWith("CLIENT_") ? "gold" : "inProgress"}>
+                              {u.role.name}
+                            </Badge>
+                          </td>
+                          <td className="py-3.5 px-3 font-semibold text-[#475569]">
+                            {u.tenant?.name || "Agency Staff"}
+                          </td>
+                          <td className="py-3.5 px-3"><Badge variant="completed">{u.status || "ACTIVE"}</Badge></td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

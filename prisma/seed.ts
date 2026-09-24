@@ -8,7 +8,7 @@ const adapter = new PrismaMariaDb(connectionString);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🌱 Starting seed script...");
+  console.log("[SEED] Starting seed script...");
 
   // Clear existing data safely
   await prisma.auditLog.deleteMany();
@@ -30,7 +30,7 @@ async function main() {
   await prisma.role.deleteMany();
   await prisma.tenant.deleteMany();
 
-  console.log("🧹 Cleared existing database tables.");
+  console.log("[SEED] Cleared existing database tables.");
 
   // 1. Roles & Permissions Setup
   const roleNames = [
@@ -119,7 +119,7 @@ async function main() {
     }
   }
 
-  console.log("✅ Roles and permissions seeded.");
+  console.log("[SEED] Roles and permissions seeded.");
 
   // 2. Tenants (Companies)
   const acmeTenant = await prisma.tenant.create({
@@ -162,7 +162,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Tenants seeded (Acme Corp & Nexus Tech).");
+  console.log("[SEED] Tenants seeded (Acme Corp & Nexus Tech).");
 
   // 3. Password Hashing & Users
   const defaultPasswordHash = await bcrypt.hash("Password123!", 10);
@@ -247,7 +247,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Users seeded (Agency Staff & Client Accounts).");
+  console.log("[SEED] Users seeded (Agency Staff & Client Accounts).");
 
   // 4. Projects for Acme Corp
   const acmeProject1 = await prisma.project.create({
@@ -308,7 +308,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Projects seeded.");
+  console.log("[SEED] Projects seeded.");
 
   // 5. Tasks & Deliverables for Acme Project 1
   const task1 = await prisma.task.create({
@@ -386,7 +386,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Tasks & Deliverables with Version History seeded.");
+  console.log("[SEED] Tasks & Deliverables with Version History seeded.");
 
   // 6. Google Drive Resources Hub
   await prisma.googleDriveResource.createMany({
@@ -430,7 +430,7 @@ async function main() {
     ],
   });
 
-  console.log("✅ Google Drive Resources seeded.");
+  console.log("[SEED] Google Drive Resources seeded.");
 
   // 7. Meetings (Cal.com integration links)
   await prisma.meeting.create({
@@ -509,7 +509,7 @@ async function main() {
     ],
   });
 
-  console.log("✅ Invoices seeded.");
+  console.log("[SEED] Invoices seeded.");
 
   // 10. Audit Log Initial Entry
   await prisma.auditLog.create({
@@ -521,12 +521,12 @@ async function main() {
     },
   });
 
-  console.log("🎉 Seed process completed successfully!");
+  console.log("[SEED] Seed process completed successfully!");
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Seed script error:", e);
+    console.error("[SEED ERROR] Seed script error:", e);
     process.exit(1);
   })
   .finally(async () => {

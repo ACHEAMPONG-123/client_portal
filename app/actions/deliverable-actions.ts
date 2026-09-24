@@ -263,3 +263,61 @@ export async function clientRequestChangesAction(
     return { success: false, error: "Failed to submit revision request." };
   }
 }
+
+/**
+ * Server Action: Fetches Task Board and Project selection list for Agency workspace.
+ */
+export async function getAgencyTaskBoardData() {
+  const session = await requireAuth();
+
+  const projects = await prisma.project.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, tenantId: true },
+  });
+
+  const tasks = await prisma.task.findMany({
+    orderBy: { updatedAt: "desc" },
+    include: {
+      project: { select: { name: true } },
+      tenant: { select: { name: true } },
+      assignee: { select: { name: true } },
+    },
+  });
+
+  const deliverables = await prisma.deliverable.findMany({
+    orderBy: { updatedAt: "desc" },
+    include: {
+      project: { select: { name: true } },
+      tenant: { select: { name: true } },
+      versions: { orderBy: { createdAt: "desc" } },
+    },
+  });
+
+  return {
+    userSession: session,
+    projects,
+    tasks,
+    deliverables,
+  };
+}
+
+/**
+ * Server Action: Fetches Deliverables Visibility Matrix for Agency PMs.
+ */
+export async function getAgencyProjectsData() {
+  const session = await requireAuth();
+
+  const deliverables = await prisma.deliverable.findMany({
+    orderBy: { updatedAt: "desc" },
+    include: {
+      project: { select: { name: true } },
+      tenant: { select: { name: true } },
+    },
+  });
+
+  return {
+    userSession: session,
+    deliverables,
+  };
+}
+
